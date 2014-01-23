@@ -5,6 +5,13 @@ import time
 
 def handle_get_request(conn, path):
     conn.send("HTTP/1.0 200 OK\r\n")
+	#@comment could probably just send content type here. 
+	# or put 'text/html' in a variable here and send it at the end.
+	# content_type = "text/html"
+	# ...
+	# conn.send(content_type)
+	# Do something similar for body too. Then you don't have to write send
+	# twice in every if.
     if (path == "/"):
         conn.send("Content-type: text/html\r\n\r\n")
         body = """
@@ -42,6 +49,7 @@ def handle_get_request(conn, path):
         """
         conn.send(body)
 
+#@comment You'll probably want to support path for post also
 def handle_post_request(conn):
     conn.send("HTTP/1.0 200 OK\r\n")
     conn.send("Content-type: text/html\r\n\r\n")
