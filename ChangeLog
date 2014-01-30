@@ -24,3 +24,7 @@
  with both GET and POST methods.
  * Added tests for GET and POST to /submit
  * Adjusted tests to match the new html pages written
+ 
+ 2014-01-30  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added in some tests to create additional code coverage.

@@ -54,8 +54,41 @@ def test_handle_connection_form_post():
 	server.handle_connection(conn)
 
 	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
-# Test a basic GET call.
 
+def test_handle_connection_bad_form_post():
+	
+	conn = FakeConnection(
+		"POST /dingus HTTP/1.0\r\n\r\n" + \
+		"ccn=999&ssn=333")
+	expected_return = 'HTTP/1.0 404 Not found\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'Connection: close\r\n' + \
+					'\r\n' + \
+					'bad form'
+	
+	server.handle_connection(conn)
+	
+	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+	
+def test_handle_connection_bad_page():
+	
+	conn = FakeConnection("GET /fake_9999.html HTTP/1.0\r\n\r\n")
+	expected_return = 'HTTP/1.0 404 Not found\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'Connection: close\r\n' + \
+					'\r\n' + \
+					'<html><body>\n' +\
+					'<h1>404 Error</h1>You requested something that doesn\'t exist.\n' +\
+					'<br/><a href="/content.html">Content</a>\n' +\
+					'<br/><a href="/file.html">File</a>\n' +\
+					'<br/><a href="/image.html">Image</a>\n' +\
+					'</body></html>'
+	
+	server.handle_connection(conn)
+	
+	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+	
+# Test a basic GET call.
 def test_handle_connection_root():
 	conn = FakeConnection("GET / HTTP/1.0\r\n\r\n")
 	expected_return = 'HTTP/1.0 200 OK\r\n' + \
