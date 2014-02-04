@@ -1,11 +1,15 @@
 #!/usr/bin/env python
+import cgitb
+import cgi
 import random
 import socket
 import time
 import os
 import urlparse
+import StringIO
 from urlparse import urlparse
 from urlparse import parse_qs
+from mimetools import Message
 
 def main():
 	s = socket.socket()         # Create a socket object
@@ -27,35 +31,50 @@ def main():
 		
 def handle_connection(conn):
 	request = conn.recv(1000)
-	
-	request_components = request.split(' ')
-	request_type = 'text/html'
-	path = '/'
 
-	if len(request_components) > 0:
-		request_type = request.split(' ')[0]
-	if len(request_components) > 1:
-		path = request.split(' ')[1]
+	request_line, headers_alone = request.split('\r\n', 1)
+	headers = Message(StringIO.StringIO(headers_alone))
 
-	headers_start = request.index('\r\n')
+	request_line = request.split(' ')
+	request_type = request.split(' ')[0]
+	path = request.split(' ')[1]
+	#Note: write a test where the request line is empty?
 
 	parsed_path = urlparse(path)
-	print "Request Information ----------"
-	print "Path: " + path
-	print "Type: " + request_type
-	print "Params: " + parsed_path.params
-	print "Query: " + parsed_path.query
-	
+
 	if request_type == "POST":
-		request_payload = request.split('\r\n\r\n')[1]
-		handle_post_request(path, request_type, request_payload, conn)
+		if('content-type' in headers.keys()):
+			print "Content-Type:",headers["content-type"]
+			headers_dict = {}
+			for key in headers.keys(): #copy values into our own dict
+				headers_dict[key] = headers[key];
+				
+			if("application/x-www-form-urlencoded" in headers["content-type"]):
+				request_payload = request.split('\r\n\r\n',1)[1]
+				print "Request Payload:",request_payload
+				handle_post_request(path, request_payload, conn)
+			elif("multipart/form-data" in headers["content-type"]):
+				request_payload = request.split('\r\n\r\n',1)[1]
+				print "Request Headers:",headers_dict
+				stringio_payload = StringIO.StringIO()
+				stringio_payload.write(request_payload)
+				stringio_payload.close()
+				fieldstorage_payload = cgi.FieldStorage(stringio_payload, {"content-type":"multipart/form-data"})
+				handle_multipart_post_request(path, fieldstorage_payload, conn)
+		else:
+			request_payload = request.split('\r\n\r\n')[1]
+			handle_post_request(path, request_payload, conn)
+			
 	elif request_type == "GET":
 		handle_get_request(path, parsed_path, conn)
 	
 		
 	conn.close()
-
-def handle_post_request(path, type, payload, conn):
+	
+def handle_multipart_post_request(path, payload, conn):
+	print "Larry",payload.keys()
+	
+def handle_post_request(path, payload, conn):
 
 	if(path == '/submit'):
 		form_data = parse_qs(payload)

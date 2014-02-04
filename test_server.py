@@ -54,7 +54,29 @@ def test_handle_connection_form_post():
 	server.handle_connection(conn)
 
 	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+	
+def test_handle_connection_multipart_form_post():
+	conn = FakeConnection(
+		"POST /submit HTTP/1.0\r\n" + \
+		"Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" +\
+		"--AaB03x\r\n" +\
+		"Content-Disposition: form-data; name='submit-name'\r\n" +\
+		"\r\n" +\
+		"Larry\r\n" +\
+		"--AaB03x\r\n" +\
+		"Content-Disposition: form-data; name='files'; filename='file1.txt'\r\n" +\
+		"Content-Type: text/plain\r\n" +\
+		"\r\n" +\
+		"... contents of file1.txt ...\r\n" +\
+		"--AaB03x--\r\n"
+		)
+	expected_return = ""
+			
+	server.handle_connection(conn)
 
+	assert "" == "no", 'Got: %s' % (repr(conn.sent),)
+
+	
 def test_handle_connection_bad_form_post():
 	
 	conn = FakeConnection(
