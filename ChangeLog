@@ -15,3 +15,16 @@
  other type of request.
  * Added tests for the different path connections and the
  POST request.
+ 
+ 2014-01-30  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Updated server.py to deliver content based on the 
+ relative http path given. 
+ * Updated server.py to do a bit of form submission handling
+ with both GET and POST methods.
+ * Added tests for GET and POST to /submit
+ * Adjusted tests to match the new html pages written
+ 
+ 2014-01-30  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added in some tests to create additional code coverage.
