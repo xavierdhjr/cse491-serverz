@@ -5,6 +5,8 @@ import random
 import socket
 import time
 import os
+import jinja2
+import sys
 import urlparse
 import StringIO
 from urlparse import urlparse
@@ -30,8 +32,16 @@ def main():
 		handle_connection(c)
 		
 def handle_connection(conn):
-	request = conn.recv(1000)
 
+	partial_request = conn.recv(1)
+	bytes_read = 0
+	request = ""
+	while(partial_request):
+		request = request + partial_request
+		bytes_read += 1
+		partial_request = conn.recv(1)
+
+		
 	request_line, headers_alone = request.split('\r\n', 1)
 	headers = Message(StringIO.StringIO(headers_alone))
 
@@ -44,22 +54,17 @@ def handle_connection(conn):
 
 	if request_type == "POST":
 		if('content-type' in headers.keys()):
-			print "Content-Type:",headers["content-type"]
 			headers_dict = {}
 			for key in headers.keys(): #copy values into our own dict
 				headers_dict[key] = headers[key];
 				
 			if("application/x-www-form-urlencoded" in headers["content-type"]):
 				request_payload = request.split('\r\n\r\n',1)[1]
-				print "Request Payload:",request_payload
 				handle_post_request(path, request_payload, conn)
 			elif("multipart/form-data" in headers["content-type"]):
 				request_payload = request.split('\r\n\r\n',1)[1]
-				print "Request Headers:",headers_dict
-				stringio_payload = StringIO.StringIO()
-				stringio_payload.write(request_payload)
-				stringio_payload.close()
-				fieldstorage_payload = cgi.FieldStorage(stringio_payload, {"content-type":"multipart/form-data"})
+				environ = { "REQUEST_METHOD":"POST"};
+				fieldstorage_payload = cgi.FieldStorage(fp=StringIO.StringIO(request_payload), headers=headers_dict, environ=environ)
 				handle_multipart_post_request(path, fieldstorage_payload, conn)
 		else:
 			request_payload = request.split('\r\n\r\n')[1]
@@ -72,7 +77,12 @@ def handle_connection(conn):
 	conn.close()
 	
 def handle_multipart_post_request(path, payload, conn):
-	print "Larry",payload.keys()
+	if(path == '/submit'):
+		form_handle_submit(payload.getvalue("'ccn'"),payload.getvalue("'ssn'"),conn)
+	else:
+		conn.send(http_404_header())
+		conn.send("bad form")
+	
 	
 def handle_post_request(path, payload, conn):
 
@@ -102,18 +112,22 @@ def handle_get_request(path, parsed_path, conn):
 	dirname, filename = os.path.split(os.path.abspath(__file__))
 	dirname = dirname + "\\"
 	
-	path = dirname + path
+	#path = dirname + path
+	
+	loader = jinja2.FileSystemLoader(dirname + "templates")
+	env = jinja2.Environment(loader=loader,autoescape=True)
+	
+	print "Path:",path
 	
 	try:
-		with open(path, "r") as myfile:
-			data = myfile.read()
-			conn.send(http_header())
-			conn.send(data)
-	except IOError:
-		with open(dirname + "404.html", "r") as myfile:
-			data = myfile.read()
-			conn.send(http_404_header()) # Could not find file to serve
-			conn.send(data)
+		template = env.get_template(path)
+		html = template.render()
+		conn.send(http_header())
+		conn.send(html)
+	except:
+		template = env.get_template("404.html")
+		conn.send(http_404_header()) # Could not find file to serve
+		conn.send(template.render())
 		
 	print 'request handled'
 

@@ -28,3 +28,12 @@
  2014-01-30  xavier.durandhollis <xavierdhjr@gmail.com>
  
  * Added in some tests to create additional code coverage.
+ 
+ 2014-02-05  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added in Jinja2 templating.
+ * Added in support for multipart form data. 
+ * Added tests for mutlipart data, updated tests to deal 
+ with Jinja2.
+ * Moved html docs into templates folder
+ * Server now reads requests of arbitrary size

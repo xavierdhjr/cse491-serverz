@@ -27,7 +27,7 @@ class FakeConnection(object):
 
 def test_handle_connection_form_get():
 	conn = FakeConnection("GET /submit?ccn=999&ssn=111 HTTP/1.0\r\n\r\n")
-	expected_return = 'HTTP/1.0 200 OK\r\n' + \
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
 			'Content-type: text/html\r\n' + \
 			'\r\n' +\
 			"<html><body>Thanks. You have won. Your information: " + \
@@ -43,7 +43,24 @@ def test_handle_connection_form_post():
 	conn = FakeConnection(
 		"POST /submit HTTP/1.0\r\n\r\n" + \
 		"ccn=999&ssn=333")
-	expected_return = 'HTTP/1.0 200 OK\r\n' + \
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
+			'Content-type: text/html\r\n' + \
+			'\r\n' +\
+			"<html><body>Thanks. You have won. Your information: " + \
+			"<br/>CC:999 <br/>SSN:333 " +  \
+			"<br/><img src='http://bhpmss.org/yahoo_site_admin/assets/images/money.135143522.jpg'/>" + \
+			"</body></html>"
+			
+	server.handle_connection(conn)
+
+	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+	
+def test_handle_connection_form_explicit_post():
+	conn = FakeConnection(
+		"POST /submit HTTP/1.0\r\n" + \
+		"Content-Type: application/x-www-form-urlencoded\r\n\r\n" + \
+		"ccn=999&ssn=333")
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
 			'Content-type: text/html\r\n' + \
 			'\r\n' +\
 			"<html><body>Thanks. You have won. Your information: " + \
@@ -60,9 +77,13 @@ def test_handle_connection_multipart_form_post():
 		"POST /submit HTTP/1.0\r\n" + \
 		"Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" +\
 		"--AaB03x\r\n" +\
-		"Content-Disposition: form-data; name='submit-name'\r\n" +\
+		"Content-Disposition: form-data; name='ccn'\r\n" +\
 		"\r\n" +\
-		"Larry\r\n" +\
+		"111\r\n" +\
+		"--AaB03x\r\n" +\
+		"Content-Disposition: form-data; name='ssn'\r\n" +\
+		"\r\n" +\
+		"000\r\n" +\
 		"--AaB03x\r\n" +\
 		"Content-Disposition: form-data; name='files'; filename='file1.txt'\r\n" +\
 		"Content-Type: text/plain\r\n" +\
@@ -70,19 +91,26 @@ def test_handle_connection_multipart_form_post():
 		"... contents of file1.txt ...\r\n" +\
 		"--AaB03x--\r\n"
 		)
-	expected_return = ""
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
+				'Content-type: text/html\r\n' + \
+				'\r\n' +\
+				"<html><body>Thanks. You have won. Your information: " + \
+				"<br/>CC:111 <br/>SSN:000 " +  \
+				"<br/><img src='http://bhpmss.org/yahoo_site_admin/assets/images/money.135143522.jpg'/>" + \
+				"</body></html>"
 			
 	server.handle_connection(conn)
 
-	assert "" == "no", 'Got: %s' % (repr(conn.sent),)
+	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
 	
 def test_handle_connection_bad_form_post():
 	
 	conn = FakeConnection(
-		"POST /dingus HTTP/1.0\r\n\r\n" + \
+		"POST /dingus HTTP/1.0\r\n" + \
+		"Content-Type: application/x-www-form-urlencoded\r\n\r\n" + \
 		"ccn=999&ssn=333")
-	expected_return = 'HTTP/1.0 404 Not found\r\n' + \
+	expected_return = u'HTTP/1.0 404 Not found\r\n' + \
 					'Content-type: text/html\r\n' + \
 					'Connection: close\r\n' + \
 					'\r\n' + \
@@ -92,10 +120,40 @@ def test_handle_connection_bad_form_post():
 	
 	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 	
+def test_handle_connection_bad_multipart_form_post():
+	
+	conn = FakeConnection(
+		"POST /dingus HTTP/1.0\r\n" + \
+		"Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" +\
+		"--AaB03x\r\n" +\
+		"Content-Disposition: form-data; name='ccn'\r\n" +\
+		"\r\n" +\
+		"111\r\n" +\
+		"--AaB03x\r\n" +\
+		"Content-Disposition: form-data; name='ssn'\r\n" +\
+		"\r\n" +\
+		"000\r\n" +\
+		"--AaB03x\r\n" +\
+		"Content-Disposition: form-data; name='files'; filename='file1.txt'\r\n" +\
+		"Content-Type: text/plain\r\n" +\
+		"\r\n" +\
+		"... contents of file1.txt ...\r\n" +\
+		"--AaB03x--\r\n"
+		)
+	expected_return = u'HTTP/1.0 404 Not found\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'Connection: close\r\n' + \
+					'\r\n' + \
+					'bad form'
+	
+	server.handle_connection(conn)
+	
+	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+		
 def test_handle_connection_bad_page():
 	
 	conn = FakeConnection("GET /fake_9999.html HTTP/1.0\r\n\r\n")
-	expected_return = 'HTTP/1.0 404 Not found\r\n' + \
+	expected_return = u'HTTP/1.0 404 Not found\r\n' + \
 					'Content-type: text/html\r\n' + \
 					'Connection: close\r\n' + \
 					'\r\n' + \
@@ -113,7 +171,7 @@ def test_handle_connection_bad_page():
 # Test a basic GET call.
 def test_handle_connection_root():
 	conn = FakeConnection("GET / HTTP/1.0\r\n\r\n")
-	expected_return = 'HTTP/1.0 200 OK\r\n' + \
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
 					'Content-type: text/html\r\n' + \
 					'\r\n' + \
 					'<html><body>\n' + \
@@ -131,7 +189,7 @@ def test_handle_connection_root():
 	
 def test_handle_connection_content():
 	conn = FakeConnection("GET /content.html HTTP/1.0\r\n\r\n")
-	expected_return = 'HTTP/1.0 200 OK\r\n' + \
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
 					'Content-type: text/html\r\n' + \
 					'\r\n' + \
 					'<html><body><h1>Content</h1>This is xavierdhjr\'s Web server.</body></html>'
@@ -142,7 +200,7 @@ def test_handle_connection_content():
 	
 def test_handle_connection_file():
 	conn = FakeConnection("GET /file.html HTTP/1.0\r\n\r\n")
-	expected_return = 'HTTP/1.0 200 OK\r\n' + \
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
 					'Content-type: text/html\r\n' + \
 					'\r\n' + \
 					'<html><body><h1>File</h1>This is xavierdhjr\'s Web server.</body></html>'
@@ -153,12 +211,12 @@ def test_handle_connection_file():
 	
 def test_handle_connection_image():
 	conn = FakeConnection("GET /image.html HTTP/1.0\r\n\r\n")
-	expected_return = 'HTTP/1.0 200 OK\r\n' + \
-					'Content-type: text/html\r\n' + \
-					'\r\n' + \
-					'<html><body><h1>Image</h1>This is xavierdhjr\'s Web server.</body></html>'
+	expected_return = u'HTTP/1.0 200 OK\r\n' + \
+					u'Content-type: text/html\r\n' + \
+					u'\r\n' + \
+					u'<html><body><h1>Image</h1>This is xavierdhjr\'s Web server.</body></html>'
 
 	server.handle_connection(conn)
 
-	assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+	assert conn.sent == expected_return, 'Expected %s, \n\n Got: %s' % (repr(expected_return),repr(conn.sent),)
 	
