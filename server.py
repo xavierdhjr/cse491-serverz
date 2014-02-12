@@ -13,6 +13,8 @@ from urlparse import urlparse
 from urlparse import parse_qs
 from mimetools import Message
 
+from app import make_app
+
 def main():
 	s = socket.socket()         # Create a socket object
 	host = 'localhost'#socket.getfqdn() # Get local machine name
@@ -33,127 +35,52 @@ def main():
 		
 def handle_connection(conn):
 
+	print "Handling connection"
 	partial_request = conn.recv(1)
 	bytes_read = 0
-	request = ""
-	while(partial_request):
-		request = request + partial_request
+	request = partial_request
+	
+	while '\r\n\r\n' not in request:
 		bytes_read += 1
 		partial_request = conn.recv(1)
-
+		request = request + partial_request
+	
 		
 	request_line, headers_alone = request.split('\r\n', 1)
 	headers = Message(StringIO.StringIO(headers_alone))
 
+	headers_dict = { "content-type" : "text/plain", "content-length":0 }
+	for key in headers.keys(): #copy values into our own dict
+		headers_dict[key] = headers[key];
+		
+	#print "headers",headers_dict
+	
+	print "Request:",request
+	
 	request_line = request.split(' ')
 	request_type = request.split(' ')[0]
 	path = request.split(' ')[1]
 	#Note: write a test where the request line is empty?
-
 	parsed_path = urlparse(path)
-
-	if request_type == "POST":
-		if('content-type' in headers.keys()):
-			headers_dict = {}
-			for key in headers.keys(): #copy values into our own dict
-				headers_dict[key] = headers[key];
-				
-			if("application/x-www-form-urlencoded" in headers["content-type"]):
-				request_payload = request.split('\r\n\r\n',1)[1]
-				handle_post_request(path, request_payload, conn)
-			elif("multipart/form-data" in headers["content-type"]):
-				request_payload = request.split('\r\n\r\n',1)[1]
-				environ = { "REQUEST_METHOD":"POST"};
-				fieldstorage_payload = cgi.FieldStorage(fp=StringIO.StringIO(request_payload), headers=headers_dict, environ=environ)
-				handle_multipart_post_request(path, fieldstorage_payload, conn)
-		else:
-			request_payload = request.split('\r\n\r\n')[1]
-			handle_post_request(path, request_payload, conn)
-			
-	elif request_type == "GET":
-		handle_get_request(path, parsed_path, conn)
+	wsgi_environ = {
+		"PATH_INFO" : path,
+		"REQUEST_METHOD" : request_type,
+		"QUERY_STRING" : parsed_path.query,
+		"CONTENT_TYPE" : headers_dict["content-type"],
+		"CONTENT_LENGTH" : headers_dict["content-length"],
+		"wsgi.input" : request.split('\r\n\r\n',1)[1]
+	}
 	
-		
+	the_wsgi_app = make_app()
+	print "Created the WSGI app"
+
+	def start_response(app_status, app_headers):
+		print "App Headers", app_headers
+		print "App Status", app_status
+	
+	conn.send(the_wsgi_app(wsgi_environ, start_response))
+
 	conn.close()
-	
-def handle_multipart_post_request(path, payload, conn):
-	if(path == '/submit'):
-		form_handle_submit(payload.getvalue("'ccn'"),payload.getvalue("'ssn'"),conn)
-	else:
-		conn.send(http_404_header())
-		conn.send("bad form")
-	
-	
-def handle_post_request(path, payload, conn):
 
-	if(path == '/submit'):
-		form_data = parse_qs(payload)
-		form_handle_submit(form_data["ccn"][0],form_data["ssn"][0],conn)
-	else:
-		conn.send(http_404_header())
-		conn.send("bad form")
-	
-#didn't refactor the main function into many page functions
-#because I felt like this was cooler
-#I did however do it for the GET form
-def handle_get_request(path, parsed_path, conn):
-
-	if(path.split('?')[0] == "/submit"):
-		form_data = parse_qs(parsed_path.query)
-		form_handle_submit(form_data["ccn"][0],form_data["ssn"][0],conn)
-		return
-		
-		
-	if path[len(path) - 1] == '/':
-		path = path + "index.html"
-	if path[0] == '/':
-		path = path[1:]
-		
-	dirname, filename = os.path.split(os.path.abspath(__file__))
-	dirname = dirname + "\\"
-	
-	#path = dirname + path
-	
-	loader = jinja2.FileSystemLoader(dirname + "templates")
-	env = jinja2.Environment(loader=loader,autoescape=True)
-	
-	print "Path:",path
-	
-	try:
-		template = env.get_template(path)
-		html = template.render()
-		conn.send(http_header())
-		conn.send(html)
-	except:
-		template = env.get_template("404.html")
-		conn.send(http_404_header()) # Could not find file to serve
-		conn.send(template.render())
-		
-	print 'request handled'
-
-#spits back out a response for a form submission
-def form_handle_submit(ccn,ssn,conn):
-	conn.send(http_header())
-
-	response = "<html><body>Thanks. You have won. Your information: " + \
-				"<br/>CC:{ccn} <br/>SSN:{ssn} " +  \
-				"<br/><img src='http://bhpmss.org/yahoo_site_admin/assets/images/money.135143522.jpg'/>" + \
-				"</body></html>"
-	response = response.replace("{ccn}", ccn)
-	response = response.replace("{ssn}", ssn)
-	conn.send(response)
-
-	return
-	
-def http_header():
-	return 'HTTP/1.0 200 OK\r\n' + \
-			'Content-type: text/html\r\n' + \
-			'\r\n'
-def http_404_header():
-	return 'HTTP/1.0 404 Not found\r\n' + \
-					'Content-type: text/html\r\n' + \
-					'Connection: close\r\n' + \
-					'\r\n'
-	
 if __name__ == '__main__':
    main()
