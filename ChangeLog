@@ -37,3 +37,13 @@
  with Jinja2.
  * Moved html docs into templates folder
  * Server now reads requests of arbitrary size
+ 
+ 2014-02-13  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Pages now actually use Jinja2 Templating
+ * Refactored the server to conform to WSGI app standards
+	Is also a lot cleaner, inspired by leflerja @ github
+ * Deleted server.py, now using ref-server.py
+ * Added a 500 Internal Server Error page
+ * Wrote a few tests for the new app. Keeping old tests
+	around so I remember what to test in the future.
