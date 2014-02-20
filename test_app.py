@@ -119,4 +119,87 @@ def test_get_image():
 
 	assert status == '200 OK'
 	assert ('Content-type', 'image/jpeg') in headers
-	pass
+
+def test_post_multipart():
+	environ = {}
+	environ['PATH_INFO'] = '/submit'
+	environ['REQUEST_METHOD'] = 'POST'
+	environ['CONTENT_TYPE'] = 'multipart/form-data; boundary=AaB03x'
+	
+	form =	"--AaB03x\r\n" + \
+			  "Content-Disposition: form-data; name=\"ccn\";" + \
+			  " filename=\"ccn\"\r\n\r\n" + \
+			  "999\r\n" + \
+			  "--AaB03x\r\n" + \
+			  "Content-Disposition: form-data; name=\"ssn\";" + \
+			  " filename=\"ssn\"\r\n\r\n" + \
+			  "000\r\n" + \
+			  "--AaB03x--\r\n"
+
+	environ['CONTENT_LENGTH'] = str(len(form))
+	
+	environ['wsgi.input'] = StringIO(form)
+	
+	d = {}
+	def test_start_response(s, h, return_in=d):
+		d['status'] = s
+		d['headers'] = h
+		print "Headers", h
+
+	test_app = app.Application()
+	results = test_app(environ, test_start_response)
+	
+	text = "".join(results)
+	status, headers = d['status'], d['headers']
+
+	
+	assert text.find("999"), "missing 999"
+	assert text.find("Your CCN"), "missing ccn"
+	assert text.find("000"), "missing 000"
+	assert text.find("Your SSN"), "missing ssn"
+	assert status == '200 OK'
+	assert ('Content-type', 'text/html') in headers
+
+def test_weird_request_type():
+	environ = {}
+	environ['PATH_INFO'] = '/'
+	environ['REQUEST_METHOD'] = 'DINGUS'
+	environ['QUERY_STRING'] = ''
+
+	d = {}
+	def test_start_response(s, h, return_in=d):
+		d['status'] = s
+		d['headers'] = h
+		print "Headers", h
+
+	test_app = app.Application()
+	results = test_app(environ, test_start_response)
+	
+	text = "".join(results)
+	status, headers = d['status'], d['headers']
+
+	assert text.find("xavierdhjr"), "xavierdhjr"
+	assert status == '200 OK'
+	assert ('Content-type', 'text/html') in headers
+	
+def test_syntax_error_page():
+	environ = {}
+	environ['PATH_INFO'] = '/bad_page'
+	environ['REQUEST_METHOD'] = 'GET'
+	environ['QUERY_STRING'] = ''
+
+	d = {}
+	def test_start_response(s, h, return_in=d):
+		d['status'] = s
+		d['headers'] = h
+		print "Headers", h
+
+	test_app = app.Application()
+	results = test_app(environ, test_start_response)
+	
+	text = "".join(results)
+	status, headers = d['status'], d['headers']
+
+	assert text.find("500 Internal Server Error"), "500 error"
+	assert status == '500 Internal Server Error'
+	assert ('Content-type', 'text/html') in headers
