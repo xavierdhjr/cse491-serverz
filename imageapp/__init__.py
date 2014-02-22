@@ -10,3 +10,8 @@ def create_publisher():
      p.is_thread_safe = True
      return p
  
+def setup():                            # stuff that should be run once.
+    pass
+
+def teardown():                         # stuff that should be run once.
+    pass
