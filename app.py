@@ -65,6 +65,9 @@ class Application(object):
 			fs = cgi.FieldStorage(fp=environ['wsgi.input'], \
 								headers=headers, environ=environ)
 			params.update({x: [fs[x].value] for x in fs.keys()})
+			
+		print "Params:",params
+		
 		result = self.render_page(environ["PATH_INFO"], params)
 		start_response(result["status"], [('Content-type', result["content-type"])])
 		
@@ -88,6 +91,7 @@ class Application(object):
 		env = jinja2.Environment(loader=loader,autoescape=True)
 		
 		try:
+			print "Params:",params
 			template = env.get_template(path + ".html")
 			html = template.render(params)
 			rendered_page += html

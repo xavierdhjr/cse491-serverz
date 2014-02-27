@@ -61,4 +61,9 @@
  * Added tests from github.com/leflerja and modified
 	to fit needs. Got 100% code coverage now.
  * Added a 'bad_page' for testing how template syntax
-	errors are handled.
+	errors are handled.	
+	
+ 2014-02-26  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added imageapp
+ * Added cookie header handling
