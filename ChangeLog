@@ -46,4 +46,19 @@
  * Deleted server.py, now using ref-server.py
  * Added a 500 Internal Server Error page
  * Wrote a few tests for the new app. Keeping old tests
-	around so I remember what to test in the future.
+	around so I remember what to test in the future. 
+	
+ 2014-02-19  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Created some pages that deliver a file and an image.
+ * Tested quixote
+ * Added tests for file and image pages
+	
+ 2014-02-19  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added back in server.py. Source taken from 
+	github.com/MaxwellGBrown and modified to fit needs.
+ * Added tests from github.com/leflerja and modified
+	to fit needs. Got 100% code coverage now.
+ * Added a 'bad_page' for testing how template syntax
+	errors are handled.

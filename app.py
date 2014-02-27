@@ -12,6 +12,12 @@ from wsgiref.simple_server import make_server
 
 class Application(object):
 	def __call__(self, environ, start_response):
+	
+		if(environ["PATH_INFO"] == "/file"):
+			return self.temp_serve_file(environ, start_response)
+		elif(environ["PATH_INFO"] == "/image"):
+			return self.temp_serve_image(environ, start_response)
+	
 		if(environ["REQUEST_METHOD"] == "POST"):
 			return self.handle_post(environ, start_response)
 		elif(environ["REQUEST_METHOD"] == "GET"):
@@ -19,12 +25,36 @@ class Application(object):
 		else:
 			return self.handle_get(environ, start_response)
 			
+	def temp_serve_image(self, environ, start_response):
+		dirname, filename = os.path.split(os.path.abspath(__file__))
+		dirname = dirname + "\\"
+		
+		fp = open(dirname + "doge.jpg", "rb")
+		data = fp.read()
+
+		fp.close()
+	
+		start_response("200 OK", [('Content-type', "image/jpeg")])
+		return [data]
+		
+	def temp_serve_file(self, environ, start_response):
+		dirname, filename = os.path.split(os.path.abspath(__file__))
+		dirname = dirname + "\\"
+		
+		fp = open(dirname + "hello_world.txt", "r")
+		data = fp.read()
+		fp.close()
+		
+		start_response("200 OK", [('Content-type', "text/plain")])
+		return [data]
+
 	def handle_get(self, environ, start_response):
 		params = parse_qs(environ['QUERY_STRING'])
+		
 		result = self.render_page(environ["PATH_INFO"], params)
 		
 		start_response(result["status"], [('Content-type', result["content-type"])])
-		return result["page"]
+		return [result["page"]]
 		
 	def handle_post(self, environ, start_response):
 		headers = {}
@@ -38,7 +68,7 @@ class Application(object):
 		result = self.render_page(environ["PATH_INFO"], params)
 		start_response(result["status"], [('Content-type', result["content-type"])])
 		
-		return result["page"]
+		return [result["page"]]
 		
 	def render_page(self, path, params):
 		rendered_page = ""
@@ -56,8 +86,6 @@ class Application(object):
 			
 		loader = jinja2.FileSystemLoader(dirname + "templates")
 		env = jinja2.Environment(loader=loader,autoescape=True)
-		
-		
 		
 		try:
 			template = env.get_template(path + ".html")

@@ -2,11 +2,26 @@
 import socket
 import random
 
+import quixote
+from quixote.demo import create_publisher
+
 from wsgiref.simple_server import make_server
 
 from app import make_app
 
-###
+#testing quixote
+""" 
+_the_app = None
+def make_app():
+	global _the_app
+	
+	if _the_app is None:
+		p = create_publisher()
+		p.is_thread_safe = True
+		_the_app = quixote.get_wsgi_app()
+		
+	return _the_app
+"""
 
 the_wsgi_app = make_app()
 
