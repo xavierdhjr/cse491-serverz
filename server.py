@@ -16,8 +16,8 @@ import jinja2
 import os
 
 ## for the wsgi app
-#import app## other appsimport quixote
-#from quixote.demo.altdemo import create_publisher #login demoimport imageapp #image application
+from app import make_app## other apps#import quixote
+#from quixote.demo.altdemo import create_publisher #login demo#import imageapp #image application
 from wsgiref.validate import validator
 _quixote_app = Nonedef make_quixote_app():	global _quixote_app		if(_quixote_app is None):		p = create_publisher()		_quixote_app = quixote.get_wsgi_app()			return _quixote_app	_image_app = Nonedef make_image_app():	global _image_app			if(_image_app is None):		imageapp.setup()		p = imageapp.create_publisher()		_image_app = quixote.get_wsgi_app()			return _image_app	
 ##
@@ -71,7 +71,7 @@ def handle_connection(conn, environ):
 			conn.send('%s: %s\r\n' % header)
 		conn.send('\r\n')
 
-	# make the app	application = make_image_app()	
+	# make the app	application = make_app()	
 	response_html = application(environ, start_response)
 	for html in response_html:
 		conn.send(html)
