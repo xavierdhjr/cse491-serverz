@@ -110,7 +110,7 @@ class Application(object):
 			, "status": status
 			, "content-type": content_type 
 			}
-	
+			
 def make_app():
     return Application()
 	

@@ -17,8 +17,12 @@ import os
 
 ## for the wsgi app
 import app## other appsimport quixote
-#from quixote.demo.altdemo import create_publisher #login demo#import imageapp #image application
+#from quixote.demo.altdemo import create_publisher #login demoimport imageapp #image application
 from wsgiref.validate import validator
+
+if(True):
+	def make_app():
+		return make_image_app()
 _quixote_app = Nonedef make_quixote_app():	global _quixote_app		if(_quixote_app is None):		p = create_publisher()		_quixote_app = quixote.get_wsgi_app()			return _quixote_app	_image_app = Nonedef make_image_app():	global _image_app			if(_image_app is None):		imageapp.setup()		p = imageapp.create_publisher()		_image_app = quixote.get_wsgi_app()			return _image_app	
 ##
 ## HANDLE CONNECTION DEFINITION
@@ -33,6 +37,8 @@ def handle_connection(conn, environ):
 	# Parse headers
 	request, data = read.split('\r\n',1)
 
+	print "Read Data:",read
+	
 	headers = {}
 	for line in data.split('\r\n')[:-2]:
 		k, v = line.split(': ',1)
@@ -40,6 +46,7 @@ def handle_connection(conn, environ):
 
 	# parse path and query string as urlparse object
 	# parsed_url[2] = path, parsed_url[4] = query string
+	print "beans"
 	parsed_url = urlparse(request.split(' ', )[1])
 
 	environ['PATH_INFO'] = parsed_url[2]
@@ -51,9 +58,11 @@ def handle_connection(conn, environ):
 		environ['REQUEST_METHOD'] = 'POST'
 		environ['CONTENT_LENGTH'] = headers['content-length']
 		environ['CONTENT_TYPE'] = headers['content-type']
-		# read the remaining data from http request to construct wsgi.input
-		while len(content) < int(headers['content-length']):
-			content += conn.recv(1)
+		print "this is the beans"
+		contentLength = int(environ['CONTENT_LENGTH'])
+		content = conn.recv(contentLength)
+		
+		#print "Content:",content
 	else:
 		environ['REQUEST_METHOD'] = 'GET'
 		environ['CONTENT_LENGTH'] = 0	if('cookie' in headers):		environ['HTTP_COOKIE'] = headers['cookie']
@@ -63,7 +72,7 @@ def handle_connection(conn, environ):
 
 	environ['wsgi.input'] = StringIO(content)
 
-
+	print "this is the beans knees"
 
 	def start_response(status, response_headers):
 		conn.send('HTTP/1.0 %s\r\n' % status)
@@ -75,15 +84,16 @@ def handle_connection(conn, environ):
 	response_html = application(environ, start_response)
 	for html in response_html:
 		conn.send(html)
-
+	
+	print "this is the beans knees for real"
 	# close the connection
 	conn.close()
 
 
-def get_server_environ(port = 9999):
+def get_server_environ(port = 9999, server_name = "localhost"):
 	environ = {}
 	
-	environ['SERVER_NAME'] = "localhost"
+	environ['SERVER_NAME'] = server_name#"localhost"
 	environ['SERVER_PORT'] = str(port)
 	environ['wsgi.version'] = (1,0)
 	environ['wsgi.errors'] = StringIO()
@@ -112,7 +122,7 @@ def main(socket_module = socket):
 	
 	# Some initial information about the server
 	
-	environ = get_server_environ(port)
+	environ = get_server_environ(port, host)
 	
 	while True:
 		# Establish connection with client.
