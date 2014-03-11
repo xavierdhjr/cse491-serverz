@@ -2,6 +2,7 @@
 
 #This is directly ripped from github.com/MaxwellGBrown
 
+import sys
 import random
 import socket
 import time
@@ -16,18 +17,20 @@ import jinja2
 import os
 
 ## for the wsgi app
-import app## other appsimport quixote
-#from quixote.demo.altdemo import create_publisher #login demoimport imageapp #image application
+from app import make_app## other apps#import quixote
+#from quixote.demo.altdemo import create_publisher #login demo#import imageapp #image application
 from wsgiref.validate import validator
 
-if(True):
+if(False):
 	def make_app():
 		return make_image_app()
-_quixote_app = Nonedef make_quixote_app():	global _quixote_app		if(_quixote_app is None):		p = create_publisher()		_quixote_app = quixote.get_wsgi_app()			return _quixote_app	_image_app = Nonedef make_image_app():	global _image_app			if(_image_app is None):		imageapp.setup()		p = imageapp.create_publisher()		_image_app = quixote.get_wsgi_app()			return _image_app	
+
+		"""_quixote_app = Nonedef make_quixote_app():	global _quixote_app		if(_quixote_app is None):		p = create_publisher()		_quixote_app = quixote.get_wsgi_app()			return _quixote_app	"""_image_app = Nonedef make_image_app():	global _image_app			if(_image_app is None):		imageapp.setup()		p = imageapp.create_publisher()		_image_app = quixote.get_wsgi_app()			return _image_app	
 ##
 ## HANDLE CONNECTION DEFINITION
 ##
 def handle_connection(conn, environ):
+
 
 	# Start reading in data from the connection
 	read = conn.recv(1)
@@ -54,14 +57,15 @@ def handle_connection(conn, environ):
 
 	# Handle reading of POST data
 	content = ''
+	
 	if request.startswith('POST '):
 		environ['REQUEST_METHOD'] = 'POST'
 		environ['CONTENT_LENGTH'] = headers['content-length']
 		environ['CONTENT_TYPE'] = headers['content-type']
 		print "this is the beans"
-		contentLength = int(environ['CONTENT_LENGTH'])
+		contentLength = int(environ['CONTENT_LENGTH'])	
 		content = conn.recv(contentLength)
-		
+		print "length of content:",contentLength
 		#print "Content:",content
 	else:
 		environ['REQUEST_METHOD'] = 'GET'
@@ -96,7 +100,7 @@ def get_server_environ(port = 9999, server_name = "localhost"):
 	environ['SERVER_NAME'] = server_name#"localhost"
 	environ['SERVER_PORT'] = str(port)
 	environ['wsgi.version'] = (1,0)
-	environ['wsgi.errors'] = StringIO()
+	environ['wsgi.errors'] = sys.stderr
 	environ['wsgi.multithread'] = False
 	environ['wsgi.multiprocess'] = False
 	environ['wsgi.run_once'] = False
