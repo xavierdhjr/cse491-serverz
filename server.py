@@ -16,7 +16,7 @@ import jinja2
 import os
 
 ## for the wsgi app
-#import app## other appsimport quixote
+import app## other appsimport quixote
 #from quixote.demo.altdemo import create_publisher #login demoimport imageapp #image application
 from wsgiref.validate import validator
 _quixote_app = Nonedef make_quixote_app():	global _quixote_app		if(_quixote_app is None):		p = create_publisher()		_quixote_app = quixote.get_wsgi_app()			return _quixote_app	_image_app = Nonedef make_image_app():	global _image_app			if(_image_app is None):		imageapp.setup()		p = imageapp.create_publisher()		_image_app = quixote.get_wsgi_app()			return _image_app	
@@ -102,7 +102,7 @@ def get_server_environ(port = 9999):
 
 def main(socket_module = socket):
 	s = socket_module.socket()         # Create a socket object
-	host = "localhost" # Changed to localhost because my machine throws exceptions at getfqdn for some reason
+	host = s.getfqdn() #"localhost" # Changed to localhost because my machine throws exceptions at getfqdn for some reason
 	port = random.randint(8000, 9999)
 	s.bind((host, port))        # Bind to the port
 	print 'Starting server on', host, port

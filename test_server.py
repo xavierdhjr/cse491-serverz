@@ -55,7 +55,8 @@ def test_images():
 
     if ('HTTP/1.0 200 OK' and \
         'Content-type: image/jpeg') not in result:
-        assert False
+		
+        assert False, result
     else:
         pass
 

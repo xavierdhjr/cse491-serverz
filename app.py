@@ -12,7 +12,6 @@ from wsgiref.simple_server import make_server
 
 class Application(object):
 	def __call__(self, environ, start_response):
-	
 		if(environ["PATH_INFO"] == "/file"):
 			return self.temp_serve_file(environ, start_response)
 		elif(environ["PATH_INFO"] == "/image"):
@@ -25,11 +24,14 @@ class Application(object):
 		else:
 			return self.handle_get(environ, start_response)
 			
-	def temp_serve_image(self, environ, start_response):
+	def rel_open(self, file_name, file_mode):
 		dirname, filename = os.path.split(os.path.abspath(__file__))
-		dirname = dirname + "\\"
+		file_path = os.path.join(dirname, file_name)
+		fp = open(file_path, file_mode)
+		return fp
 		
-		fp = open(dirname + "doge.jpg", "rb")
+	def temp_serve_image(self, environ, start_response):
+		fp = self.rel_open("doge.jpg", "rb")
 		data = fp.read()
 
 		fp.close()
@@ -38,10 +40,8 @@ class Application(object):
 		return [data]
 		
 	def temp_serve_file(self, environ, start_response):
-		dirname, filename = os.path.split(os.path.abspath(__file__))
-		dirname = dirname + "\\"
-		
-		fp = open(dirname + "hello_world.txt", "r")
+	
+		fp = self.rel_open("hello_world.txt", "r")
 		data = fp.read()
 		fp.close()
 		
@@ -85,9 +85,8 @@ class Application(object):
 		print "Path:",path
 		
 		dirname, filename = os.path.split(os.path.abspath(__file__))
-		dirname = dirname + "\\"
-			
-		loader = jinja2.FileSystemLoader(dirname + "templates")
+		dir = os.path.join(dirname, "")
+		loader = jinja2.FileSystemLoader(dir + "templates")
 		env = jinja2.Environment(loader=loader,autoescape=True)
 		
 		try:
