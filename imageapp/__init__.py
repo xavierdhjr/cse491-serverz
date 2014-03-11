@@ -18,8 +18,8 @@ def setup():                            # stuff that should be run once.
 	html.init_templates()
 
 	dirname, filename = os.path.split(os.path.abspath(__file__))
-	dirname = dirname + "\\"
-	some_data = open(dirname + 'dice.png', 'rb').read()
+	path = os.path.join(dirname,'dice.png')
+	some_data = open(path, 'rb').read()
 	image.add_image(some_data)
     
 
