@@ -67,3 +67,7 @@
  
  * Added imageapp
  * Added cookie header handling
+ 
+ 2014-02-27 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Fixed imageapp on Windows
