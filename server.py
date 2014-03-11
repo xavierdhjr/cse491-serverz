@@ -102,7 +102,7 @@ def get_server_environ(port = 9999):
 
 def main(socket_module = socket):
 	s = socket_module.socket()         # Create a socket object
-	host = s.getfqdn() #"localhost" # Changed to localhost because my machine throws exceptions at getfqdn for some reason
+	host = socket_module.getfqdn() #"localhost" # Changed to localhost because my machine throws exceptions at getfqdn for some reason
 	port = random.randint(8000, 9999)
 	s.bind((host, port))        # Bind to the port
 	print 'Starting server on', host, port
