@@ -71,3 +71,11 @@
  2014-02-27 xavier.durandhollis <xavierdhjr@gmail.com>
  
  * Fixed imageapp on Windows
+ 	
+ 2014-03-17  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added command line arguments that let you choose what
+	app to run. (image, altdemo, and myapp)
+ * Fixed an issue where the server wasn't reading the 
+	contents of a post request properly
+ 

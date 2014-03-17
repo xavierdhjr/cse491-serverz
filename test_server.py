@@ -65,14 +65,19 @@ def test_form():
     server.handle_connection(conn, server.get_server_environ())
     result = conn.sent
 
-    if ('HTTP/1.0 200 OK' and \
+    assert 'HTTP/1.0 200 OK' and \
         'Content-type: text/html' and \
         'Credit Card Number' and \
 		'Social Security Number' and \
-		'<input type=\'submit\' value=\'Enter\'/>') not in result:
-        assert False
-    else:
-        pass
+		'<input type=\'submit\' value=\'Enter\'/>' \
+		in result, "Form not returned."
+
+def test_submit_without_params():
+	conn = FakeConnection("GET /submit HTTP/1.0\r\n\r\n")
+	server.handle_connection(conn, server.get_server_environ())
+	result = conn.sent
+	
+	assert '500 Internal Server Error' in result, "500 error was not delivered as expected.\n" + result
 
 def test_submit():
     conn = FakeConnection("GET /submit?ccn=999&ssn=000 HTTP/1.0\r\n\r\n")
@@ -162,7 +167,8 @@ class FakeConnection(object):
 		assert n == 5
 		if n != 5:
 			raise Exception("n should be five you dumby")
-
+	def getpeername(self):
+		return ("127.0.0.1","9999")
 	def accept(self):
 		print "socket accept"
 		self.n_times_accept_called += 1

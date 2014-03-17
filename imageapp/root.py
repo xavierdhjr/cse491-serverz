@@ -16,17 +16,19 @@ class RootDirectory(Directory):
 
     @export(name='upload_receive')
     def upload_receive(self):
-        request = quixote.get_request()
-        print request.form.keys()
+		print "upload receive start"
+		request = quixote.get_request()
+		print "got request"
+		print request.form.keys()
 
-        the_file = request.form['file']
-        print "dir",dir(the_file)
-        print 'received file with name:', the_file.base_filename
-        data = the_file.read(int(1e9))
+		the_file = request.form['file']
+		print "dir",dir(the_file)
+		print 'received file with name:', the_file.base_filename
+		data = the_file.read(int(1e9))
 
-        image.add_image(data)
+		image.add_image(data)
 
-        return quixote.redirect('./')
+		return self.index()
 
     @export(name='image')
     def image(self):

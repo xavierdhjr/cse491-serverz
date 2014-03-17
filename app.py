@@ -48,10 +48,20 @@ class Application(object):
 		start_response("200 OK", [('Content-type', "text/plain")])
 		return [data]
 
+	def checkForExceptions_thenCallRenderPage(self, environ, params):
+		result = {}
+		try:
+			result = self.render_page(environ["PATH_INFO"], params)
+		except jinja2.UndefinedError:
+			print "\t**Exception caught:","jinja2.UndefinedError"
+			result = self.render_page("/500",params)
+		return result
+		
 	def handle_get(self, environ, start_response):
 		params = parse_qs(environ['QUERY_STRING'])
 		
-		result = self.render_page(environ["PATH_INFO"], params)
+		# Be sure nothing horrible happens
+		result = self.checkForExceptions_thenCallRenderPage(environ, params)
 		
 		start_response(result["status"], [('Content-type', result["content-type"])])
 		return [result["page"]]
@@ -66,9 +76,9 @@ class Application(object):
 								headers=headers, environ=environ)
 			params.update({x: [fs[x].value] for x in fs.keys()})
 			
-		print "Params:",params
+		# Be sure nothing horrible happens
+		result = self.checkForExceptions_thenCallRenderPage(environ, params)
 		
-		result = self.render_page(environ["PATH_INFO"], params)
 		start_response(result["status"], [('Content-type', result["content-type"])])
 		
 		return [result["page"]]
@@ -81,16 +91,18 @@ class Application(object):
 		
 		if(path == ""):
 			path = "index"
-		
-		print "Path:",path
-		
+
 		dirname, filename = os.path.split(os.path.abspath(__file__))
 		dir = os.path.join(dirname, "")
 		loader = jinja2.FileSystemLoader(dir + "templates")
 		env = jinja2.Environment(loader=loader,autoescape=True)
 		
+		if path == "500":
+			status = "500 Internal Server Error"
+		elif path == "400":
+			status = "404 Not Found"
+		
 		try:
-			print "Params:",params
 			template = env.get_template(path + ".html")
 			html = template.render(params)
 			rendered_page += html
@@ -103,7 +115,6 @@ class Application(object):
 			rendered_page += template.render(params)
 			status = "500 Internal Server Error"
 			print "Syntax Error on", path
-		
 			
 		return { 
 			"page" : str(rendered_page)
