@@ -61,4 +61,26 @@
  * Added tests from github.com/leflerja and modified
 	to fit needs. Got 100% code coverage now.
  * Added a 'bad_page' for testing how template syntax
-	errors are handled.
+	errors are handled.	
+	
+ 2014-02-26  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added imageapp
+ * Added cookie header handling
+ 
+ 2014-02-27 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Fixed imageapp on Windows
+ 	
+ 2014-03-17  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added command line arguments that let you choose what
+	app to run. (image, altdemo, and myapp)
+ * Fixed an issue where the server wasn't reading the 
+	contents of a post request properly
+  	
+ 2014-03-17  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Fixed an issue where uploading more than one file
+	would cause an exception.
+ 

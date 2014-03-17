@@ -12,7 +12,6 @@ from wsgiref.simple_server import make_server
 
 class Application(object):
 	def __call__(self, environ, start_response):
-	
 		if(environ["PATH_INFO"] == "/file"):
 			return self.temp_serve_file(environ, start_response)
 		elif(environ["PATH_INFO"] == "/image"):
@@ -25,11 +24,14 @@ class Application(object):
 		else:
 			return self.handle_get(environ, start_response)
 			
-	def temp_serve_image(self, environ, start_response):
+	def rel_open(self, file_name, file_mode):
 		dirname, filename = os.path.split(os.path.abspath(__file__))
-		dirname = dirname + "\\"
+		file_path = os.path.join(dirname, file_name)
+		fp = open(file_path, file_mode)
+		return fp
 		
-		fp = open(dirname + "doge.jpg", "rb")
+	def temp_serve_image(self, environ, start_response):
+		fp = self.rel_open("doge.jpg", "rb")
 		data = fp.read()
 
 		fp.close()
@@ -38,20 +40,28 @@ class Application(object):
 		return [data]
 		
 	def temp_serve_file(self, environ, start_response):
-		dirname, filename = os.path.split(os.path.abspath(__file__))
-		dirname = dirname + "\\"
-		
-		fp = open(dirname + "hello_world.txt", "r")
+	
+		fp = self.rel_open("hello_world.txt", "r")
 		data = fp.read()
 		fp.close()
 		
 		start_response("200 OK", [('Content-type', "text/plain")])
 		return [data]
 
+	def checkForExceptions_thenCallRenderPage(self, environ, params):
+		result = {}
+		try:
+			result = self.render_page(environ["PATH_INFO"], params)
+		except jinja2.UndefinedError:
+			print "\t**Exception caught:","jinja2.UndefinedError"
+			result = self.render_page("/500",params)
+		return result
+		
 	def handle_get(self, environ, start_response):
 		params = parse_qs(environ['QUERY_STRING'])
 		
-		result = self.render_page(environ["PATH_INFO"], params)
+		# Be sure nothing horrible happens
+		result = self.checkForExceptions_thenCallRenderPage(environ, params)
 		
 		start_response(result["status"], [('Content-type', result["content-type"])])
 		return [result["page"]]
@@ -65,7 +75,10 @@ class Application(object):
 			fs = cgi.FieldStorage(fp=environ['wsgi.input'], \
 								headers=headers, environ=environ)
 			params.update({x: [fs[x].value] for x in fs.keys()})
-		result = self.render_page(environ["PATH_INFO"], params)
+			
+		# Be sure nothing horrible happens
+		result = self.checkForExceptions_thenCallRenderPage(environ, params)
+		
 		start_response(result["status"], [('Content-type', result["content-type"])])
 		
 		return [result["page"]]
@@ -78,14 +91,16 @@ class Application(object):
 		
 		if(path == ""):
 			path = "index"
-		
-		print "Path:",path
-		
+
 		dirname, filename = os.path.split(os.path.abspath(__file__))
-		dirname = dirname + "\\"
-			
-		loader = jinja2.FileSystemLoader(dirname + "templates")
+		dir = os.path.join(dirname, "")
+		loader = jinja2.FileSystemLoader(dir + "templates")
 		env = jinja2.Environment(loader=loader,autoescape=True)
+		
+		if path == "500":
+			status = "500 Internal Server Error"
+		elif path == "400":
+			status = "404 Not Found"
 		
 		try:
 			template = env.get_template(path + ".html")
@@ -100,14 +115,13 @@ class Application(object):
 			rendered_page += template.render(params)
 			status = "500 Internal Server Error"
 			print "Syntax Error on", path
-		
 			
 		return { 
 			"page" : str(rendered_page)
 			, "status": status
 			, "content-type": content_type 
 			}
-	
+			
 def make_app():
     return Application()
 	
