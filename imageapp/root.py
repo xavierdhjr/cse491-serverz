@@ -22,13 +22,14 @@ class RootDirectory(Directory):
 		print request.form.keys()
 
 		the_file = request.form['file']
+		print "File FP:",the_file.fp
 		print "dir",dir(the_file)
 		print 'received file with name:', the_file.base_filename
-		data = the_file.read(int(1e9))
+		data = the_file.fp.read()
 
 		image.add_image(data)
-
-		return self.index()
+		the_file.close()
+		return quixote.redirect('./')
 
     @export(name='image')
     def image(self):

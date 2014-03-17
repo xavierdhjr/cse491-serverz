@@ -145,6 +145,7 @@ def handle_connection(conn, environ, selected_app = APP_MINE):
 	for html in response_html:
 		conn.send(html)
 
+	environ['wsgi.input'].close()
 	conn.close()
 
 def get_server_environ(port = 9999, server_name = "localhost"):
