@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %} 
+Form (GET)
+{% endblock title %}
+
+
+{% block body %}
+<h1>Form</h1>
+Win $5000:
+<form action='/submit' method='GET'>
+	<label>Credit Card Number:</label>
+	<input type='text' name='ccn'/>
+	<label>Social Security Number:</label>
+	<input type='text' name='ssn'/>
+	<input type='submit' value='Enter'/>
+</form>
+{% endblock body %}

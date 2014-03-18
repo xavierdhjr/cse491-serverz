@@ -1,0 +1,8 @@
+setlocal query "reaper of souls"
+
+go http://us.battle.net/en/
+
+fv 1 q $query
+submit search-button
+
+show
