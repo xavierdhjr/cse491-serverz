@@ -1,0 +1,11 @@
+go /404
+find "404"
+
+go /500
+find "500"
+
+go /bad_page
+find "500"
+
+go /
+find "Hello world"
