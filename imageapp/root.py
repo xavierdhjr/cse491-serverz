@@ -12,12 +12,12 @@ class RootDirectory(Directory):
     def index(self):
         return html.render('index.html')
 
-    @export(name='jquery')
-    def jquery(self):
+	@export(name='jquery')
+	def jquery(self):
 		dirname = os.path.dirname(__file__)
 		dirname = os.path.join(dirname,"imageapp")
 		jquery_path = os.path.join(dirname,'jquery-1.3.2.min.js')
-        return open(jquery_path).read()
+		return open(jquery_path).read()
 
     @export(name='upload')
     def upload(self):
