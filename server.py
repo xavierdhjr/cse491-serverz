@@ -169,7 +169,7 @@ def get_server_environ(port = 9999, server_name = "localhost"):
 
 def main(socket_module = socket):
 	s = socket_module.socket()         # Create a socket object
-	host = socket_module.getfqdn() 
+	host = "localhost"#socket_module.getfqdn() 
 	# Changed to localhost because my machine throws 
 	# exceptions at getfqdn for some reason
 	
