@@ -87,6 +87,8 @@
 2014-03-19  xavier.durandhollis <xavierdhjr@gmail.com>
 
  * Added a page on imageapp that supports ajax image
- uploading using Javascript / JQuery
+ uploading using Javascript / JQuery.
  * Added Twill tests
+ * Added a command prompt argument for choosing the 
+ server name.
  
