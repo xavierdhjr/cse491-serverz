@@ -1,11 +1,42 @@
 go /404
+code 200
 find "404"
 
 go /500
+code 500
 find "500"
 
 go /bad_page
+code 500
 find "500"
 
 go /
+code 200
 find "Hello world"
+
+go /content
+code 200
+find "Content"
+
+go /file
+code 200
+find "hello world this is a text file"
+
+go /form
+formvalue 1 ccn "beans"
+formvalue 1 ssn "dingus"
+submit
+code 200
+find "beans"
+find "dingus"
+
+go /form_post
+formvalue 1 ccn "beans"
+formvalue 1 ssn "dingus"
+submit
+code 200
+find "beans"
+find "dingus"
+
+go /image
+code 200

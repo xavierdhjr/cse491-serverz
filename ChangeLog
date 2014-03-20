@@ -83,4 +83,10 @@
 
  * Fixed an issue where uploading more than one file
 	would cause an exception.
+	
+2014-03-19  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Added a page on imageapp that supports ajax image
+ uploading using Javascript / JQuery
+ * Added Twill tests
  
