@@ -14,7 +14,10 @@ class RootDirectory(Directory):
 
     @export(name='jquery')
     def jquery(self):
-        return open('jquery-1.3.2.min.js').read()
+		dirname = os.path.dirname(__file__)
+		dirname = os.path.join(dirname,"imageapp")
+		jquery_path = os.path.join(dirname,'jquery-1.3.2.min.js')
+        return open(jquery_path).read()
 
     @export(name='upload')
     def upload(self):
