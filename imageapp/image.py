@@ -12,7 +12,7 @@ def add_image(data):
 	images = images + (data,)
 	print "Stored image",image_num
 	return image_num
-
+	
 def get_image(num):
 	global images
 	return images[num]

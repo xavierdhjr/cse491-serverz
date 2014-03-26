@@ -51,6 +51,10 @@ parser.add_argument('-p', metavar='port' \
 	, default=random.randint(8000,9999) \
 	, type=int
 	, help='What port the server should run on')
+parser.add_argument('-host', metavar='host' \
+	, nargs='?'
+	, default=socket.getfqdn() \
+	, help='Use this to choose what name this server uses.')
 
 args = parser.parse_args()
 
@@ -169,11 +173,12 @@ def get_server_environ(port = 9999, server_name = "localhost"):
 
 def main(socket_module = socket):
 	s = socket_module.socket()         # Create a socket object
-	host = socket_module.getfqdn() 
+	#host = "localhost"#socket_module.getfqdn() 
 	# Changed to localhost because my machine throws 
 	# exceptions at getfqdn for some reason
 	
 	### PROGRAM ARGUMENTS ###
+	host = args.host
 	port = args.p 
 	selected_app = args.A
 	###
