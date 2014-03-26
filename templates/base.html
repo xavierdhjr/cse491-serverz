@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+{% block head %}
+  <title> Xavierdhjr's Web Server - {% block title %} {% endblock title %} </title>
+{% endblock head %}
+
+{% block style %}
+{% endblock style %}
+</head>
+
+<body>
+{% block body %}
+{% endblock body %}
+
+<!-- Navigation -->
+<br/><a href="/form">Form</a>
+<br/><a href="/form_post">Form (POST)</a>
+<br/><a href="/content">Content</a>
+<br/><a href="/file">File</a>
+<br/><a href="/image">Image</a>
+
+{% block scripts %}
+{% endblock scripts %}
+</body>
+</html>

@@ -1,3 +1,94 @@
 2014-01-07  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
  * Initialized repository, created server.py and README.
+
+2014-01-12  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Updated server.py to display a hello world message. 
+ Server now prints
+ out Request headers from client on the console.
+
+2014-01-22  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Updated server.py to handle requests to different paths.
+ Server now also handles POST requests different from any
+ other type of request.
+ * Added tests for the different path connections and the
+ POST request.
+ 
+ 2014-01-30  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Updated server.py to deliver content based on the 
+ relative http path given. 
+ * Updated server.py to do a bit of form submission handling
+ with both GET and POST methods.
+ * Added tests for GET and POST to /submit
+ * Adjusted tests to match the new html pages written
+ 
+ 2014-01-30  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added in some tests to create additional code coverage.
+ 
+ 2014-02-05  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added in Jinja2 templating.
+ * Added in support for multipart form data. 
+ * Added tests for mutlipart data, updated tests to deal 
+ with Jinja2.
+ * Moved html docs into templates folder
+ * Server now reads requests of arbitrary size
+ 
+ 2014-02-13  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Pages now actually use Jinja2 Templating
+ * Refactored the server to conform to WSGI app standards
+	Is also a lot cleaner, inspired by leflerja @ github
+ * Deleted server.py, now using ref-server.py
+ * Added a 500 Internal Server Error page
+ * Wrote a few tests for the new app. Keeping old tests
+	around so I remember what to test in the future. 
+	
+ 2014-02-19  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Created some pages that deliver a file and an image.
+ * Tested quixote
+ * Added tests for file and image pages
+	
+ 2014-02-19  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added back in server.py. Source taken from 
+	github.com/MaxwellGBrown and modified to fit needs.
+ * Added tests from github.com/leflerja and modified
+	to fit needs. Got 100% code coverage now.
+ * Added a 'bad_page' for testing how template syntax
+	errors are handled.	
+	
+ 2014-02-26  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added imageapp
+ * Added cookie header handling
+ 
+ 2014-02-27 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Fixed imageapp on Windows
+ 	
+ 2014-03-17  xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added command line arguments that let you choose what
+	app to run. (image, altdemo, and myapp)
+ * Fixed an issue where the server wasn't reading the 
+	contents of a post request properly
+  	
+ 2014-03-17  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Fixed an issue where uploading more than one file
+	would cause an exception.
+	
+2014-03-19  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Added a page on imageapp that supports ajax image
+ uploading using Javascript / JQuery.
+ * Added Twill tests
+ * Added a command prompt argument for choosing the 
+ server name.
+ 
