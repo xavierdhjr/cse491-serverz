@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type='text/css'>
+	.image
+	{
+		width:150px;
+		float:left;
+	}
+	.image img
+	{
+		width:150px;
+	}
+</style>
+<script type="text/javascript">
+$(function()
+{
+	$template_image = $(".image");
+	$container_images = $(".images");
+	
+	$.getJSON("/get_stat?stat=basic", function(data)
+	{
+	console.log(data)
+		for(var i = 0; i < data.image_count; ++i)
+		{
+			var $image = $template_image.clone();
+			var img = new Image();
+			img.src = "/get_image?id=" + i;
+			img.onload = event_onImageLoad;
+			$(img).hide();
+			$image.append(img);
+			$container_images.append($image);
+			$image.show();
+			//$image.append("<img src='/get_image?id=" + i + "'/>");
+			//$image.appendTo(container_images);
+		}
+	});
+	
+	function event_onImageLoad(e)
+	{
+		$(this).fadeIn();
+	}
+
+});
+</script>
+<h1>All Images</h1>
+<div class='images'>
+	<div class='image' style='display:none;'></div>
+</div>
+{% endblock %}

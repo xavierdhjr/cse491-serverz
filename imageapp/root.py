@@ -1,13 +1,16 @@
 import quixote
 from quixote.directory import Directory, export, subdir
 from quixote.util import StaticFile
+from quixote.http_request import parse_query
 import os.path
 
 from . import html, image
 
+import json
+
 class RootDirectory(Directory):
 	_q_exports = []
-
+	
 	@export(name='')                    # this makes it public.
 	def index(self):
 		return html.render('index.html')
@@ -24,6 +27,10 @@ class RootDirectory(Directory):
 	def upload(self):
 		return html.render('upload.html')
 
+	@export(name='browse')
+	def browse(self):
+		return html.render('browse.html')
+		
 	@export(name='upload_receive')
 	def upload_receive(self):
 		print "upload receive start"
@@ -89,3 +96,41 @@ class RootDirectory(Directory):
 		response.set_content_type('image/png')
 		img = image.get_latest_image()
 		return img
+		
+	@export(name='get_image')
+	def get_image(self):
+		request = quixote.get_request()
+		query = request.get_query()
+		fields = parse_query(query, quixote.DEFAULT_CHARSET)
+		
+		response = quixote.get_response()
+		response.set_content_type('image/png')
+		
+		if(len(fields) > 0 and "id" in fields):
+			image_id = int(fields["id"])
+			return image.get_image(image_id)
+			
+		return image.get_latest_image()
+
+	@export(name='get_stat')
+	def get_stat(self):
+		request = quixote.get_request()
+		query = request.get_query()
+		fields = parse_query(query, quixote.DEFAULT_CHARSET)
+		
+		response = quixote.get_response()
+		response.set_content_type('application/json')
+		
+		stats = {}
+		
+		def json_encode(data):
+			return json.dumps(data)
+
+		if("stat" in fields):
+			stat_field = fields["stat"]
+			
+			if((str)(stat_field) == "basic"):
+				stats['image_count'] = len(image.images)
+
+		return json_encode(stats)
+		

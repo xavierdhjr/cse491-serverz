@@ -25,36 +25,36 @@ class QuotesApp(object):
       return self.file_server(environ, start_response)
 
 class FileServer(object):
-   def __init__(self,path):
-      self.path = os.path.abspath(path)
-   
-   def __call__(self, environ, start_response):
-      url = environ['PATH_INFO']
-      
-      print 'url:' + url
-      if url.endswith('/'):
-          url += 'index.html'
-          
-      fullpath = self.path + url
-      fullpath = os.path.abspath(fullpath)
-      assert fullpath.startswith(self.path)
-      
-      extension=mimetypes.guess_type(fullpath)
-      extension=extension[0]
-      
-      if extension is None:
-          extension = 'text/plain'
-     
-      status = '200 OK'
-      headers = [('Content-type', extension )]
-      
-      try:
-        fp = open(fullpath)
-        contents = fp.read()
-        start_response(status, headers)
-        return [contents]
-      except:
-        status = '404 Not Found'
-        headers = [('Content-type', 'text/html')]
-        start_response(status, headers)
-        return ['404 Not Found']
+	def __init__(self,path):
+		self.path = os.path.abspath(path)
+		print self.path
+	def __call__(self, environ, start_response):
+		url = environ['PATH_INFO']
+
+		print 'url:' + url
+		if url.endswith('/'):
+			url += 'index.html'
+		  
+		fullpath = self.path + url
+		fullpath = os.path.abspath(fullpath)
+		assert fullpath.startswith(self.path)
+
+		extension=mimetypes.guess_type(fullpath)
+		extension=extension[0]
+		print "Full Path: ", fullpath
+		if extension is None:
+			extension = 'text/plain'
+
+		status = '200 OK'
+		headers = [('Content-type', extension )]
+
+		try:
+			fp = open(fullpath)
+			contents = fp.read()
+			start_response(status, headers)
+			return [contents]
+		except:
+			status = '404 Not Found'
+			headers = [('Content-type', 'text/html')]
+			start_response(status, headers)
+			return ['404 Not Found']

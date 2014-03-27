@@ -20,6 +20,10 @@ import app## other appsimport quixote
 from quixote.demo.altdemo import create_publisher #login demoimport imageapp
 from wsgiref.validate import validator
 
+#quotes
+import quotes# import QuotesApp
+import chat# import ChatApp
+
 #### GLOBALS ####
 # Setup should only one once in choose_app
 _setup_complete = False
@@ -29,6 +33,8 @@ _setup_complete = False
 APP_QUIXOTE_ALTDEMO = "altdemo"
 APP_QUIXOTE_IMAGEAPP = "image"
 APP_MINE = "myapp"
+APP_QUOTES = "quotes"
+APP_CHAT = "chat"
 
 # This list is used to check if an invalid 
 # app was chosen.
@@ -36,6 +42,8 @@ APPS = [
 	APP_QUIXOTE_ALTDEMO
 	,APP_QUIXOTE_IMAGEAPP 
 	,APP_MINE
+	,APP_CHAT
+	,APP_QUOTES
 ]
 #### END GLOBALS ####
 
@@ -76,6 +84,12 @@ def choose_app(app_name):
 			p = imageapp.create_publisher()
 			_setup_complete = True
 		return quixote.get_wsgi_app()
+	elif(app_name == APP_CHAT):
+		chat_app = chat.make()
+		return chat_app
+	elif(app_name == APP_QUOTES):
+		quotes_app = quotes.make()
+		return quotes_app
 
 def print_request_info(environ, conn):
 	print "------------------"
