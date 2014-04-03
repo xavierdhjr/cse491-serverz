@@ -92,3 +92,18 @@
  * Added a command prompt argument for choosing the 
  server name.
  
+ 2014-03-26  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Added a page on imageapp 'browse' that displays all
+ currently uploaded images on the server.
+ * Added an API call 'get_image' that returns an image
+ with the specified 'id' in the querystring.
+ * Added an API call 'get_stat' that has one parameter
+ 'stat' with one acceptable value at the moment: 
+ 'basic'. This will currently return a JSON object 
+ containing the number of images hosted on the site.
+ * Plan on updating the 'get_stat' call with more
+ types of stats in the future.
+ * Added the Chat app
+ * Added the Quotes app
+ * Updated navigation on imageapp
