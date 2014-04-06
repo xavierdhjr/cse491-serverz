@@ -130,7 +130,7 @@ class RootDirectory(Directory):
 			stat_field = fields["stat"]
 			
 			if((str)(stat_field) == "basic"):
-				stats['image_count'] = len(image.images)
+				stats['image_count'] = image.get_image_count()
 
 		return json_encode(stats)
 		

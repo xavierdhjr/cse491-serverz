@@ -17,13 +17,13 @@ def create_publisher():
 def setup():                            # stuff that should be run once.
 	html.init_templates()
 
-	dirname = os.path.dirname(__file__)
-	dirname = os.path.join(dirname,"imageapp")
+	#dirname = os.path.dirname(__file__)
+	#dirname = os.path.join(dirname,"imageapp")
 	
-	path = os.path.join(dirname,'dice.png')
+	#path = os.path.join(dirname,'dice.png')
 
-	some_data = open(path, 'rb').read()
-	image.add_image(some_data)
+	#some_data = open(path, 'rb').read()
+	#image.add_image(some_data)
     
 
 def teardown():                         # stuff that should be run once.
