@@ -113,6 +113,10 @@ def handle_connection(conn, environ, selected_app = APP_MINE):
 	
 	# Start reading in data from the connection
 	read = conn.recv(1)
+	if not read:
+		print "Remote client closed connection without sending anything."
+		return
+	
 	while read[-4:] != '\r\n\r\n':
 		read += conn.recv(1)
 
@@ -185,16 +189,19 @@ def get_server_environ(port = 9999, server_name = "localhost"):
 ## MAIN FUNCTION DEFINITION
 ##
 
-def main(socket_module = socket):
+def main(socket_module = socket \
+	, host = args.host \
+	, port = args.p \
+	, selected_app = args.A):
 	s = socket_module.socket()         # Create a socket object
 	#host = "localhost"#socket_module.getfqdn() 
 	# Changed to localhost because my machine throws 
 	# exceptions at getfqdn for some reason
 	
 	### PROGRAM ARGUMENTS ###
-	host = args.host
-	port = args.p 
-	selected_app = args.A
+	#host = args.host
+	#port = args.p 
+	#selected_app = args.A
 	###
 	
 	if selected_app not in APPS:
@@ -211,10 +218,10 @@ def main(socket_module = socket):
 	print "Using application", selected_app
 	
 	while True:
-		# Some initial information about the server
-		environ = get_server_environ(port, host)
 		# Establish connection with client.
 		c, (client_host, client_port) = s.accept()
+		# Some initial information about the server
+		environ = get_server_environ(port, host)
 		# handle connection to serve page
 		handle_connection(c, environ, selected_app)
 

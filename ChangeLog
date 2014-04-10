@@ -107,3 +107,12 @@
  * Added the Chat app
  * Added the Quotes app
  * Updated navigation on imageapp
+ 
+ 2014-04-05 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added SQLite data persistence 
+ * Added tests for imageapp
+	* Haven't covered adding images yet. 
+ * Added instructions for setting up imageapp on 
+ an Ubuntu server on the amazon cloud.
+ 

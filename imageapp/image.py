@@ -1,23 +1,54 @@
 # image handling API
+import database
+
+class ImageRepository(object):
+	def __init__(self, database_module = database.Database('imageapp.db')):
+		self.db_module = database_module
+
+	#returns the newest row in the table
+	def get_latest(self):
+		return self.db_module.get_recent_image()
+	
+	#returns a response obj
+	# {success, message, data}
+	def get_image(self, id):
+		return self.db_module.get_db_image(id)
+		
+	#returns a response obj
+	# {success, message, data}
+	def add_image(self, data):
+		return self.db_module.add_db_image(data)
+	
+	#returns a number
+	def count_images(self):
+		return self.db_module.get_num_images()
+	
 
 images = ()
+repository = ImageRepository()
 
 def add_image(data):
-	global images
-	if images:
-		image_num = len(images)
+
+	response = repository.add_image(data)
+	if response["success"]:
+		print "Successfully added image"
 	else:
-		image_num = 0
-		
-	images = images + (data,)
-	print "Stored image",image_num
-	return image_num
-	
+		print response["message"]
+		return -1
+
+def get_image_count():
+	return repository.count_images()
+
 def get_image(num):
-	global images
-	return images[num]
+	response = repository.get_image(num)
+	if(response["success"]):
+		print "Successfully retrieved image ", num
+		id,data,date = response["data"]
+		return data
+	else:
+		print "Failed to retrieve image ", num
+		return None
 
 def get_latest_image():
-	global images
-	image_num = len(images) - 1
-	return images[image_num]
+	id, data, date = repository.get_latest()
+	return data
