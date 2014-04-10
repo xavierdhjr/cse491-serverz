@@ -19,6 +19,7 @@ import os
 import app## other appsimport quixote
 from quixote.demo.altdemo import create_publisher #login demoimport imageapp
 from wsgiref.validate import validator
+import cookieapp
 
 #quotes
 import quotes# import QuotesApp
@@ -35,6 +36,7 @@ APP_QUIXOTE_IMAGEAPP = "image"
 APP_MINE = "myapp"
 APP_QUOTES = "quotes"
 APP_CHAT = "chat"
+APP_COOKIE = "cookie"
 
 # This list is used to check if an invalid 
 # app was chosen.
@@ -44,6 +46,7 @@ APPS = [
 	,APP_MINE
 	,APP_CHAT
 	,APP_QUOTES
+	,APP_COOKIE
 ]
 #### END GLOBALS ####
 
@@ -90,6 +93,8 @@ def choose_app(app_name):
 	elif(app_name == APP_QUOTES):
 		quotes_app = quotes.make()
 		return quotes_app
+	elif(app_name == APP_COOKIE):
+		return cookieapp.wsgi_app
 
 def print_request_info(environ, conn):
 	print "------------------"
