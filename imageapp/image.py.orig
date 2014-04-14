@@ -1,0 +1,91 @@
+# image handling API
+<<<<<<< HEAD
+import database
+=======
+import cPickle
+import os
+
+IMAGE_DB_FILE = 'images.db'
+>>>>>>> ctb/day23
+
+class ImageRepository(object):
+	def __init__(self, database_module = database.Database('imageapp.db')):
+		self.db_module = database_module
+
+	#returns the newest row in the table
+	def get_latest(self):
+		return self.db_module.get_recent_image()
+	
+	#returns a response obj
+	# {success, message, data}
+	def get_image(self, id):
+		return self.db_module.get_db_image(id)
+		
+	#returns a response obj
+	# {success, message, data}
+	def add_image(self, data):
+		return self.db_module.add_db_image(data)
+	
+	#returns a number
+	def count_images(self):
+		return self.db_module.get_num_images()
+	
+
+images = ()
+repository = ImageRepository()
+
+def initialize():
+    load()
+
+def load():
+    global images
+    if os.path.exists(IMAGE_DB_FILE):
+        fp = open(IMAGE_DB_FILE, 'rb')
+        images = cPickle.load(fp)
+        fp.close()
+
+        print 'Loaded: %d images' % (len(images))
+
+def save():
+    fp = open(IMAGE_DB_FILE, 'wb')
+    cPickle.dump(images, fp)
+    fp.close()
+
+def add_image(data):
+<<<<<<< HEAD
+
+	response = repository.add_image(data)
+	if response["success"]:
+		print "Successfully added image"
+	else:
+		print response["message"]
+		return -1
+
+def get_image_count():
+	return repository.count_images()
+=======
+    if images:
+        image_num = max(images.keys()) + 1
+    else:
+        image_num = 0
+        
+    images[image_num] = data
+
+    save()
+    
+    return image_num
+>>>>>>> ctb/day23
+
+def get_image(num):
+	response = repository.get_image(num)
+	if(response["success"]):
+		print "Successfully retrieved image ", num
+		id,data,date = response["data"]
+		return data
+	else:
+		print "Failed to retrieve image ", num
+		return None
+
+def get_latest_image():
+	id, data, date = repository.get_latest()
+	return data

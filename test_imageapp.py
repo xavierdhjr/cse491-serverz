@@ -102,16 +102,16 @@ def test_repository_count_images():
 	
 	images = repository.count_images()
 	
-	assert images == 2, "image count was %s" % images
+	assert images == 20, "image count was %s" % images
 	
 def test_repository_get_latest():
 	db_module = get_test_db()
 	repository = imageapp.image.ImageRepository(db_module)
 	
-	id, data, date = repository.get_latest()
+	id, data, name, date = repository.get_latest()
 	
 	#assumes 2 images in the test database
-	assert id == 2, "ID was not 2. Was, %s" % id
+	assert id == 20, "ID was not 20. Was, %s" % id
 	
 def test_repository_get_image():
 	db_module = get_test_db()
@@ -120,17 +120,39 @@ def test_repository_get_image():
 	response = repository.get_image(1)
 	
 	assert response["success"] == True, "Get Image failed"
-	id, data, dtsInserted = response["data"]
+	id, data, name, dtsInserted = response["data"]
 	assert id == 1, "Asked for ID 1, got ID %s" % id
 	assert len(data) > 50, "Returned data: %s" % (str)(data)
 		
 	response = repository.get_image(2)
 	
 	assert response["success"] == True, "Get Image failed"
-	id, data, dtsInserted = response["data"]
+	id, data, name, dtsInserted = response["data"]
 	assert id == 2, "Asked for ID 2, got ID %s" % id
+	assert name == "imageapp/test_database\\dice.png", "Name was %s" % name
 	assert len(data) > 50, "Returned data: %s" % (str)(data)
 
+def test_repository_get_None_image():
+	db_module = get_test_db()
+	repository = imageapp.image.ImageRepository(db_module)
+	
+	response = repository.get_image(11)
+	
+	assert response["success"] == True, "Get Image failed"
+	id, data, name, dtsInserted = response["data"]
+	assert id == 11, "Asked for ID 1, got ID %s" % id
+	assert len(data) == 0, "Returned data length %s" % (str)(len(data))
+	
+def test_repository_get_Invalid_image():
+	db_module = get_test_db()
+	repository = imageapp.image.ImageRepository(db_module)
+	
+	response = repository.get_image(12)
+	
+	assert response["success"] == True, "Get Image failed"
+	id, data, name, dtsInserted = response["data"]
+	assert id == 12, "Asked for ID 1, got ID %s" % id
+	assert len(data) == len("Invalid"), "Returned data length %s" % (str)(len(data))
 
 ## HELPERS ##
 
@@ -174,7 +196,7 @@ def make_imageapp():
 	return quixote.get_wsgi_app()
 	
 def get_test_db():
-	return imageapp.database.Database("test_imageapp.db")
+	return imageapp.database.Database("test_database/test_imageapp.db")
 
 def get_response_html(response):
 	content = ""

@@ -116,3 +116,17 @@
  * Added instructions for setting up imageapp on 
  an Ubuntu server on the amazon cloud.
  
+  2014-04-09 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Data persistence implemented in previous commit
+ To create, run 
+	imageapp/create_database.py
+ To create the testing DB, run 
+	imageapp/test_database/create_test_database.py
+ * Setup a static IP for site - http://imageapp.xavdev.com
+ Please let me know if the page hangs / doesn't load and
+ I can restart the server. The free Amazon EC2 service isn't 
+ the most reliable.
+ * Added a set of test data and a README about the data. You
+ can find this in imageapp/test_database.
+ 
