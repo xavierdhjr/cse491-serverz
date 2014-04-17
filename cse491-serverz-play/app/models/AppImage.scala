@@ -5,6 +5,7 @@ import play.api.db._
 import play.api.Play.current
 case class AppImage(id: Long, data: Array[Byte])
 
+import play.api._
 object AppImage {
 	val img = {
 		get[Long]("images.Id") ~ 
@@ -38,7 +39,18 @@ object AppImage {
 		SQL("Select count(*) as c from images").apply().head[Long]("c")
 	}
 	
-	def create(data: Array[Byte]) {}
+	def add(mdata: Array[Byte]){ 
+		DB.withConnection { implicit c =>
+		SQL(
+			"""
+			INSERT INTO images 
+			(Data, DTSInserted) 
+			VALUES ({data},DateTime('now'))
+			"""
+			).on("data" -> mdata).executeUpdate()
+		}
+		Logger.info(mdata.toString());
+	}
 
 	def delete(id: Long) {}
   

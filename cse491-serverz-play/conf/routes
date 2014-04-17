@@ -2,10 +2,13 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
+# Pages
 GET     /                           controllers.Application.index
+GET		/upload						controllers.Application.upload
 
-GET		/image_raw					controllers.Application.image_raw
+# Imageapp API
+GET		/image						controllers.Application.get_image
+POST	/image						controllers.Application.add_image
 GET		/stats						controllers.Application.stats
 
 # Map static resources from the /public folder to the /assets URL path
