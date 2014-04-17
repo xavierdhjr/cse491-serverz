@@ -11,6 +11,12 @@
 	{
 		width:150px;
 	}
+	.loading
+	{
+		width:100px;
+		height:100px;
+		background-color:rgb(230, 230, 230);
+	}
 </style>
 <script type="text/javascript">
 $(function()
@@ -21,16 +27,19 @@ $(function()
 	$.getJSON("/get_stat?stat=basic", function(data)
 	{
 	console.log(data)
-		for(var i = 0; i < data.image_count; ++i)
+		for(var i = 1; i <= data.image_count; ++i)
 		{
 			var $image = $template_image.clone();
+			var $link = $("<a href='/image?id=" + i + "'>");
 			var img = new Image();
 			img.src = "/get_image?id=" + i;
 			img.onload = event_onImageLoad;
 			$(img).hide();
 			$image.append(img);
-			$container_images.append($image);
+			$container_images.append($link.append($image));
 			$image.show();
+			$image.addClass("loading");
+			
 			//$image.append("<img src='/get_image?id=" + i + "'/>");
 			//$image.appendTo(container_images);
 		}
@@ -39,6 +48,7 @@ $(function()
 	function event_onImageLoad(e)
 	{
 		$(this).fadeIn();
+		$(this).parent().removeClass("loading");
 	}
 
 });

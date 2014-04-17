@@ -14,6 +14,36 @@ class Database(object):
 	
 	def create_response(self,success = True, message = "", data = None):
 		return {'success': success, 'data': data, 'message': message}
+
+	def add_comment(self, imageId, username, comment):
+		conn = self.connect()
+		c = conn.cursor()
+		
+		c.execute('''
+			INSERT INTO comments (ImageId, Username, Comment, DTSInserted)
+			VALUES (?,?,?,DateTime('now'))
+		''', (imageId, username, comment))
+		conn.commit()
+		conn.close()
+			
+		return self.create_response(True, "Success")
+	
+	def get_comments_for_image(self, imageId):
+		conn = self.connect()
+		c = conn.cursor()
+		
+		conn = self.connect()
+		
+		c = conn.cursor()
+		c.execute('''
+			SELECT * FROM comments WHERE ImageId = ?
+		''', (imageId,))
+		
+		results = c.fetchall()
+		
+		conn.close()
+		
+		return results
 		
 	def add_db_image(self,data):
 		conn = self.connect()
