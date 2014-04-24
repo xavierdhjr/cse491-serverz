@@ -88,14 +88,45 @@ class RootDirectory(Directory):
 
 	@export(name='image')
 	def image(self):
-		return html.render('image.html')
+		request = quixote.get_request()
+		query = request.get_query()
+		fields = parse_query(query, quixote.DEFAULT_CHARSET)
+		
+		if "id" in fields:
+			image_id = int(fields["id"])
+		else:
+			id, data, name, date = image.get_latest_image()
+			image_id = id
+			
+		comments = []
+		for comment_raw in image.get_comments_for_image(image_id):
+			comments.append({"Username":comment_raw[2], "Comment":comment_raw[3], "Date":comment_raw[4]})
+			
+		image_data = image.get_image(image_id)
+		if image_data is None or len(image_data) <= 0:
+			return html.render('error.html')
+		
+		print "Comments",comments
+		
+		return html.render('image.html',{"comment_count":len(comments),"imageId":image_id,"comments":comments, "message":"OK"})
+	
+	@export(name='add_comment')
+	def add_comment(self):
+		request = quixote.get_request()
+		imageId = request.form['imageId']
+		username = request.form['username']
+		comment = request.form['comment']
 
+		image.add_comment_to_image(imageId, username, comment)
+		
+		return quixote.redirect('./image?id=' + imageId)
+		
 	@export(name='image_raw')
 	def image_raw(self):
 		response = quixote.get_response()
 		response.set_content_type('image/png')
-		img = image.get_latest_image()
-		return img
+		id, data, name, date = image.get_latest_image()
+		return data
 		
 	@export(name='get_image')
 	def get_image(self):

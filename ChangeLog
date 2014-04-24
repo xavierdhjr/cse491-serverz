@@ -130,3 +130,21 @@
  * Added a set of test data and a README about the data. You
  can find this in imageapp/test_database.
  
+ 2014-04-17 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added a simple implementation of the Imageapp (Image uploading
+ and displaying of the latest image) using the Play Framework in
+ Scala.
+ * To start up the Play server, you'll need to install Play and run
+ the 'play' command on /cse491-serverz-play and then type 'run'
+ * You will also need to edit 
+ /cse491-serverz-play/conf/application.confg 
+ and after 'db.default.url="jdbc:sqlite:' type the absolute path
+ to the imageapp database. Not sure how to do this platform 
+ independent yet!
+ * Added a commenting system (with persistent comments) to 
+ imageapp. To add a comment, click on an image and fill out the
+ form and hit 'add comment'. Existing comments should display 
+ on the same page.
+ * Images that are loading in the 'browse all' section now have a
+ gray background while they take their sweet time.

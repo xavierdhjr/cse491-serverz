@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style type='text/css'>
+	.section
+	{
+		float:left;
+		margin-left:30px;
+	}
+	.section.comments
+	{
+		width:300px;
+	}
+	.comments img
+	{
+		max-width:50%;
+		max-height:200px;
+	}
+</style>
+<div class='section'>
+<img src="/get_image?id={{ imageId }}" style="max-width:500px;"/>
+</div>
+<div class='section comments'>
+<h3>Comments ({{ comment_count }})</h3>
+
+{% for comment in comments %}
+	<p>
+		<span class='username'>{{ comment.Username }} @ {{ comment.Date }}</span><br/>
+		<span class='comment-body'>{{ comment.Comment }}</span>
+	</p>
+{% else %}
+	<p>
+		<span class='no-comments'>No Comments for this image.</span>
+	</p>
+{% endfor %}
+</div>
+<div class='section'>
+<h3>Add a comment</h3>
+<form class='form-comment' action="/add_comment" method="POST">
+	<input type="hidden" name="imageId" value="{{ imageId }}"/>
+	<label>Name</label><br/>
+	<input name="username" type="text">
+	<br/>
+	<label>Comment</label><br/>
+	<textarea name="comment"></textarea>
+	<br/>
+	<input type="submit" value="Add Comment"/>
+</form>
+</div>
+<div style="clear:both;"></div>
+{% endblock %}

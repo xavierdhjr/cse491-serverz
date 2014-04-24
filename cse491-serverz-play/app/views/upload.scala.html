@@ -1,0 +1,12 @@
+@main("Image App") {
+
+	@helper.form(action = routes.Application.add_image, 'enctype -> "multipart/form-data") {
+		Upload an Image:<br/>
+		<input type="file" name="image">
+		
+		<p>
+			<input type="submit">
+		</p>
+		
+	}
+}
