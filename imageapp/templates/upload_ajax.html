@@ -7,6 +7,8 @@ $(function()
 {
 	$input_file = $("#file");
 	$input_form = $("form");
+	$input_name = $("input[name='title']");
+	$input_desc = $("textarea[name='desc']");
 	$input_submit = $("input[type=submit]");
 	$percent_complete = $("#percent_complete");
 
@@ -15,7 +17,8 @@ $(function()
 	{	
 		var formData = new FormData();
 		formData.append('file', $input_file[0].files[0]);
-
+		formData.append('title', $input_name.val());
+		formData.append('desc', $input_desc.val());
 		$percent_complete.empty();
 		
 		var xhr = new XMLHttpRequest();
@@ -49,7 +52,9 @@ $(function()
 
 Upload a PNG ASYNC!:
 <form enctype='multipart/form-data'>
-Filename: <input type='file' name='file' id="file"><p>
+Title: <input type="text" name="title"><br/>
+Description: <br/><textarea name="desc"></textarea><br/>
+Image: <input type='file' name='file' id="file"><br/>
 <input type='submit'>
 <h3 id="loading" style='display:none;'>Uploading...</h3>
 </form>

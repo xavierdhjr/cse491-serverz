@@ -18,9 +18,20 @@
 	}
 </style>
 <div class='section'>
-<img src="/get_image?id={{ imageId }}" style="max-width:500px;"/>
+	<div class='title'>
+		<h2>{{ meta.title }}</h2>
+		<div>Added {{ meta.date }}</div>
+		<br/>
+	</div>
+	<div>
+		<img src="/get_image?id={{ imageId }}" style="max-width:500px;"/>
+	</div>
 </div>
 <div class='section comments'>
+<h3>Description</h3>
+<div class='description'>
+{{ meta.description }}
+</div>
 <h3>Comments ({{ comment_count }})</h3>
 
 {% for comment in comments %}

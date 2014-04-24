@@ -45,15 +45,15 @@ class Database(object):
 		
 		return results
 		
-	def add_db_image(self,data):
+	def add_db_image(self,data,title,description,type):
 		conn = self.connect()
 		conn.text_factory = bytes
 		c = conn.cursor()
 		
 		c.execute('''
-			INSERT INTO images (Data, DTSInserted)
-			VALUES (?,DateTime('now'))
-		''', (sqlite.Binary(data),))
+			INSERT INTO images (Data, Title, Description, Type, DTSInserted)
+			VALUES (?,?,?,?,DateTime('now'))
+		''', (sqlite.Binary(data), title, description, type))
 		conn.commit()
 		
 		c.execute('''
@@ -66,6 +66,21 @@ class Database(object):
 		
 		return self.create_response(True, "")
 
+	def get_db_image_meta(self, id):
+		conn = self.connect()
+		
+		conn.text_factory = bytes
+		
+		c = conn.cursor()
+		c.execute('''
+			SELECT * FROM images
+			WHERE Id = ?
+		''', (id,))
+		
+		result = c.fetchone()
+		
+		return result
+		
 	def get_db_image(self,id):
 		conn = self.connect()
 		

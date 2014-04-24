@@ -148,3 +148,9 @@
  on the same page.
  * Images that are loading in the 'browse all' section now have a
  gray background while they take their sweet time.
+ 
+  2014-04-24 xavier.durandhollis <xavierdhjr@gmail.com>
+ 
+ * Added image metadata: Title, Description, and Date added.
+ * Display image metadata on image page
+ * Added support for JPEG / TIF images.

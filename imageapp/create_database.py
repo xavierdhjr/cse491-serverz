@@ -11,7 +11,7 @@ c = conn.cursor()
 
 c.execute('''
 	CREATE TABLE images
-	(Id integer PRIMARY KEY AUTOINCREMENT, Data blob, Name text, DTSInserted text)
+	(Id integer PRIMARY KEY AUTOINCREMENT, Data blob, Title text, Description text, Type text, DTSInserted text)
 ''')
 c.execute('''
 	CREATE TABLE comments

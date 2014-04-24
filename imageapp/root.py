@@ -38,13 +38,20 @@ class RootDirectory(Directory):
 		print "got request"
 		print request.form.keys()
 
+		if('title' not in request.form \
+		or 'desc' not in request.form \
+		or 'file' not in request.form):
+			return html.render('upload.html')
+		
+		image_name = request.form['title']
+		image_desc = request.form['desc']
 		the_file = request.form['file']
 		print "File FP:",the_file.fp
 		print "dir",dir(the_file)
 		print 'received file with name:', the_file.base_filename
 		data = the_file.fp.read()
 
-		image.add_image(data)
+		image.add_image(data,image_name,image_desc)
 		the_file.close()
 		return quixote.redirect('./')
 		
@@ -75,15 +82,29 @@ class RootDirectory(Directory):
 		request = quixote.get_request()
 		print request.form.keys()
 
+		image_name = request.form['title']
+		image_desc = request.form['desc']
 		the_file = request.form['file']
-		print dir(the_file)
+
 		print 'received file with name:', the_file.base_filename
+
+		filetype = the_file.orig_filename.split('.')[1]
+		if (filetype == 'tif' or filetype == 'tiff'):
+			filetype = 'tiff'
+		elif filetype == 'jpeg' or filetype == 'jpg':
+			filetype = 'jpg'
+		elif filetype == 'png':
+			filetype = 'png'
+		else:
+			return {"success":False,"message":"Invalid file type provided."}
+
 		data = the_file.fp.read()
 
-		image.add_image(data)
+		
+		image.add_image(data,image_name,image_desc,filetype)
 
 		response = quixote.get_response()
-		response.set_content_type('image/png')
+		response.set_content_type("image/%s" % filetype)
 		return image.get_latest_image()
 
 	@export(name='image')
@@ -94,8 +115,10 @@ class RootDirectory(Directory):
 		
 		if "id" in fields:
 			image_id = int(fields["id"])
+			print "ID: ",image_id
+			id, data, title, desc, type, date = image.get_image_meta(int(image_id))
 		else:
-			id, data, name, date = image.get_latest_image()
+			id, data, title, desc, type, date = image.get_latest_image()
 			image_id = id
 			
 		comments = []
@@ -108,7 +131,9 @@ class RootDirectory(Directory):
 		
 		print "Comments",comments
 		
-		return html.render('image.html',{"comment_count":len(comments),"imageId":image_id,"comments":comments, "message":"OK"})
+		image_meta = {"id":id,"title":title,"description":desc,"date":date}
+		
+		return html.render('image.html',{"comment_count":len(comments),"imageId":image_id,"comments":comments,"meta":image_meta, "message":"OK"})
 	
 	@export(name='add_comment')
 	def add_comment(self):
@@ -124,8 +149,9 @@ class RootDirectory(Directory):
 	@export(name='image_raw')
 	def image_raw(self):
 		response = quixote.get_response()
-		response.set_content_type('image/png')
-		id, data, name, date = image.get_latest_image()
+		id, data, title, desc, type, date = image.get_latest_image()
+		
+		response.set_content_type("image/%s" % type) # support different kinds of image types
 		return data
 		
 	@export(name='get_image')
